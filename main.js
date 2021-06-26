@@ -5,6 +5,9 @@ import { PointLight } from 'three';
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
+
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -24,15 +27,72 @@ renderer.render( scene, camera );
 
 //3D Object.
 const geometry = new THREE.TorusGeometry( 10, 3, 16, 100 );
+//const geometry = new THREE.RingGeometry( 3, 9, 17);
+
 
 //Material for the Torus. 
-const material = new THREE.MeshStandardMaterial( { color : 0x6fffff , wireframe: true } );
+//const material = new THREE.MeshStandardMaterial( { color : 0x005500 , wireframe: true } );
+//const material = new THREE.MeshStandardMaterial( { color : 0x6fffff , wireframe: true } );
+const material = new THREE.MeshStandardMaterial( { color : 0x301934 , wireframe: true } );
 
 //The creation of the mesh : geometry + material ==> a full object.
 const torus = new THREE.Mesh( geometry, material );
-
 //now we add it to the scene.
 scene.add( torus );
+
+//Loading a personal asset
+const loader = new GLTFLoader();
+
+const AGRO = loader.load( 'models/AGRO.glb', function ( gltf ) {
+
+    var newMaterial = new THREE.MeshStandardMaterial({ color: 0x8B0000 /*color : 0x001100 */,  wireframe: true });
+    var model = gltf.scene;
+    model.material = newMaterial;
+
+    model.traverse((o) => {
+        if (o.isMesh) o.material = newMaterial;
+      });
+
+    model.position.z = 5;
+    model.position.y = 5;
+    model.position.x = 30;
+
+    model.rotation.x += 10;
+    model.rotation.y += 80;
+    model.rotation.z += 10;
+    scene.add( gltf.scene );
+    moveAGRO( model )
+    {
+        model.position.z += 5;
+        model.position.y += 5;
+        model.position.x += -1;
+
+        model.rotation.x += 10;
+        model.rotation.y += 0.05;
+        model.rotation.z += 10;
+    }
+    //gltf.position.setX(20);
+    //model.setSize(50 , 50, 100);
+    
+    document.body.onscroll = moveAGRO;
+    
+
+    
+
+}, undefined, function ( error ) {
+
+	console.error( error );
+
+} );
+
+/*const agroMaterial = new THREE.MeshLambertMaterial( { color : 0x6fffff } );
+
+const AGRO = new THREE.Mesh( agroGemetry, agroMaterial );
+                
+scene.add( AGRO );
+*/
+
+
 
 //adding light
 const pointLight = new THREE.PointLight(0xffffff);
@@ -72,7 +132,8 @@ function addStar()
 Array(200).fill().forEach(addStar);
 
 //Adding the background.
-const spaceTexture = new THREE.TextureLoader().load('space1.jpg');
+//const spaceTexture = new THREE.TextureLoader().load('oldTerminal.png');
+const spaceTexture = new THREE.TextureLoader().load('space2.jpg');
 scene.background = spaceTexture;
 
 //Adding portfolio picture
